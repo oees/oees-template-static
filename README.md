@@ -4,7 +4,7 @@ Esta plantilla sirve para crear una web pública sencilla: páginas, textos, im�
 
 Si tu web necesita guardar datos de visitantes (formularios, registros) o tiene usuarios que inician sesión, usa la plantilla de Django (`oees-template`). Claude te dice cuál necesitas.
 
-Si tu web es solo para empleados de OEES, no necesitas esta plantilla. Claude la prepara para Alexandria, la plataforma interna de OEES, y la publicas tú.
+Si tu web es solo para empleados de OEES y no guarda datos, no necesitas esta plantilla. Claude la prepara para Alexandria, la plataforma interna de OEES, y la publicas tú.
 
 ## Cómo trabajar
 
