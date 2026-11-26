@@ -1,0 +1,19 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+
+# Local environment: never commit or zip a real .env
+.env
+.env.*
+!.env.example
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+__MACOSX/
+.idea/
+.vscode/
+
+# Python (packaging script tests)
+__pycache__/

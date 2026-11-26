@@ -1,0 +1,60 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff)",
+      "Bash(git diff *)",
+      "Bash(git log)",
+      "Bash(git log *)",
+      "Bash(git show)",
+      "Bash(git show *)",
+      "Bash(git branch)",
+      "Bash(git branch *)",
+      "Bash(git add)",
+      "Bash(git add *)",
+      "Bash(git commit)",
+      "Bash(git commit *)",
+      "Bash(git stash)",
+      "Bash(git stash *)",
+      "Bash(git rebase)",
+      "Bash(git rebase *)",
+      "Bash(git fetch)",
+      "Bash(git fetch *)",
+      "Bash(ls)",
+      "Bash(ls *)",
+      "Bash(grep)",
+      "Bash(grep *)",
+      "Bash(cat)",
+      "Bash(cat *)",
+      "Bash(head)",
+      "Bash(head *)",
+      "Bash(tail)",
+      "Bash(tail *)",
+      "Bash(wc)",
+      "Bash(wc *)",
+      "Bash(mkdir)",
+      "Bash(mkdir *)",
+      "Bash(mv)",
+      "Bash(mv *)",
+      "Bash(cp)",
+      "Bash(cp *)",
+      "Bash(touch)",
+      "Bash(touch *)",
+      "Bash(make check)",
+      "Bash(make check *)",
+      "Bash(make check-fast)",
+      "Bash(make check-fast *)"
+    ],
+    "deny": [
+      "Bash(git push*)",
+      "Bash(git reset --hard*)",
+      "Bash(git rebase -i*)",
+      "Bash(git rebase --interactive*)",
+      "Bash(git filter-branch*)"
+    ]
+  },
+  "claudeMdExcludes": [
+    "**/rules/oees-agents/**"
+  ]
+}
