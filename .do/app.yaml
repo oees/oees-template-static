@@ -1,6 +1,8 @@
 # DigitalOcean App Platform spec for a static site (Tier 1).
-# Applied by .github/workflows/deploy.yml after ci passes on main; deploy_on_push is off.
-# Each deploy applies this whole file: config set only in the DO console is removed.
+# App Platform builds and deploys every push to main (deploy_on_push). main changes only
+# through a reviewed pull request with a green ci, so a merge is a deploy.
+# Tech creates the app from this file once. After that, App Platform keeps its own copy:
+# a change to this file reaches the app only when tech applies it (docs/deploy-runbook.md).
 # Edit only the lines marked EDIT.
 # A static site has no secrets: everything here and in the build ships to the browser.
 name: website-prod # EDIT: SITE-prod
@@ -15,7 +17,7 @@ static_sites:
     github:
       repo: oees/website # EDIT: the GitHub repository (owner/name)
       branch: main
-      deploy_on_push: false
+      deploy_on_push: true
     source_dir: /
     build_command: npm run build
     output_dir: dist

@@ -1,7 +1,8 @@
 name: ci
 
 # Static site (Tier 1). Runs on every pull request and on every push to main.
-# A green run on main triggers deploy.yml.
+# main is protected: a pull request merges only with a green run. App Platform deploys
+# each push to main by itself; there is no deploy workflow.
 on:
   pull_request:
   push:
