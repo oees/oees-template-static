@@ -1,0 +1,93 @@
+name: deploy
+
+# Production deploys only after `ci` has passed on a push to main.
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    # The template repository itself never deploys. Copies made from it do.
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && !github.event.repository.is_template
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: production
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    # App secrets: one line per `${NAME}` in .do/app.yaml, from the `production` environment's
+    # secrets. The deploy action substitutes them into the spec; bindables like ${db.DATABASE_URL}
+    # are left for App Platform. Uncomment and fill in when the spec gains a secret:
+    # env:
+    #   NAME: ${{ secrets.NAME }}
+    steps:
+      # App Platform builds the tip of main, so deploy only if the commit ci tested is still the
+      # tip. When main has moved on, the ci run for the newer commit triggers its own deploy.
+      - name: Check the tested commit is still the tip of main
+        id: tip
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          tip="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq .object.sha)"
+          if [ "$tip" = "$TESTED_SHA" ]; then
+            echo "current=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::main is at ${tip}, not ${TESTED_SHA}; skipping, the newer run deploys."
+            echo "current=false" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.tip.outputs.current == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+      # An unset secret would be substituted as an empty string and wipe the value in App Platform.
+      - name: Check every spec variable is set
+        if: steps.tip.outputs.current == 'true'
+        run: |
+          missing=0
+          names="$(grep -v '^[[:space:]]*#' .do/app.yaml | grep -oE '[$][{][A-Za-z_][A-Za-z0-9_]*[}]' | tr -d '{}$' | sort -u || true)"
+          for name in $names; do
+            case "$name" in APP_DOMAIN | APP_URL | APP_ID) continue ;; esac
+            if [ -z "${!name:-}" ]; then
+              echo "::error file=.do/app.yaml::${name} is referenced in the spec but not set in the job env."
+              missing=1
+            fi
+          done
+          exit "$missing"
+      # The deploy action updates the app that has the spec's name. A spec that still says
+      # website-prod, or names another repository, would replace another site's app.
+      - name: Check the spec names this site and this repository
+        if: steps.tip.outputs.current == 'true'
+        run: |
+          name="$(grep -E '^name:' .do/app.yaml | head -1 | awk '{print $2}' | tr -d "\"'")"
+          expected="${GITHUB_REPOSITORY#*/}-prod"
+          failed=0
+          if [ "$name" != "$expected" ]; then
+            echo "::error file=.do/app.yaml::The app name is '${name}'. It must be '${expected}', the repository name with -prod."
+            failed=1
+          fi
+          repos="$(grep -v '^[[:space:]]*#' .do/app.yaml | awk '$1 == "repo:" {print $2}' | tr -d "\"'" | sort -u)"
+          if [ -z "$repos" ]; then
+            echo "::error file=.do/app.yaml::No component names a github.repo."
+            failed=1
+          fi
+          for repo in $repos; do
+            if [ "$repo" != "$GITHUB_REPOSITORY" ]; then
+              echo "::error file=.do/app.yaml::A component deploys from '${repo}', not from '${GITHUB_REPOSITORY}'."
+              failed=1
+            fi
+          done
+          exit "$failed"
+      - if: steps.tip.outputs.current == 'true'
+        uses: digitalocean/app_action/deploy@cc55bc9b848d25f9c1c9f831cf843fbab3fbfb15 # v2.0.11
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          app_spec_location: .do/app.yaml
+          print_build_logs: true
+          print_deploy_logs: true

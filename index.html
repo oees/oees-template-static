@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Título de la página | Octopus Energy</title>
+    <meta
+      name="description"
+      content="Una frase que resume la página. Aparece en buscadores y al compartir."
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="site-header__brand" href="/">Octopus Energy</a>
+      <nav aria-label="Principal">
+        <a href="/">Inicio</a>
+        <a href="/ejemplo/">Página de ejemplo</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <h1>El titular principal de la página</h1>
+        <p>
+          Escribe aquí el texto de la página. Todo el contenido va en el HTML para que los
+          buscadores y las vistas previas de enlaces lo lean.
+        </p>
+      </section>
+
+      <section>
+        <h2>Una sección</h2>
+        <p>Cada sección tiene un título y su texto.</p>
+        <!-- An interactive part: React mounts here. The content around it stays in the HTML. -->
+        <div data-island="share-button"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>© Octopus Energy España</p>
+      <!-- EDIT: legal gives the real links before launch. -->
+      <a href="#">Política de privacidad</a>
+    </footer>
+  </body>
+</html>

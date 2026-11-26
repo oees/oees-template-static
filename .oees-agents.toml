@@ -1,0 +1,33 @@
+version = 1
+source = "v1.0.0"
+targets = [
+    "claude",
+    "codex",
+]
+
+[project]
+name = "website"
+description = "Public OEES website built by the marketing team from the static website template. Static pages served by DigitalOcean App Platform, with no server and no database. HANDOFF.md describes this site."
+users = "Visitors to the OEES public website. The OEES marketing team owns the content"
+blast_radius = "customer-facing"
+default_branch = "main"
+check = "make check"
+check_fast = "make check-fast"
+
+[rules]
+# migrations: static site, no database
+# api: static site, no API
+defaults = [
+    "git",
+    "observability",
+    "quality-gates",
+    "standards",
+    "tdd",
+]
+
+[kits]
+enabled = []
+
+[extras]
+commands = true
+subagents = "core"
